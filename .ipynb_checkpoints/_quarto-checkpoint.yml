@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "ml-blog"
@@ -15,6 +16,7 @@ format:
     theme: darkly
     css: styles.css
     highlight-style: espresso
+    
 
 
 
