@@ -1,0 +1,12 @@
+---
+title: "Welcome To My Blog"
+author: "Vladimir Orlenko"
+date: "2023-07-26"
+categories: [news]
+---
+
+Это мой первый пост в Quarto blog. Welcome!
+
+![](thumbnail.jpg)
+
+В данном блоге буду резмещать посты касающиеся машинного обучения и связанных с ним вопросов

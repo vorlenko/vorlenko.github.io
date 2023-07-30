@@ -1,0 +1,20 @@
+project:
+  type: website
+
+website:
+  title: "ml-blog"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/vorlenko
+      - icon: linkedin
+        href: https://www.linkedin.com/in/vladimir-orlenko-9674507/
+format:
+  html:
+    theme: darkly
+    css: styles.css
+    highlight-style: espresso
+
+
+
