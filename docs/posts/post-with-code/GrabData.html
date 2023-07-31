@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Vladimir Orlenko">
+<meta name="dcterms.date" content="2023-07-31">
+
+<title>ml-blog - Grab Wiki data/Получение данных с Wiki</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ml-blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/vorlenko" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/vladimir-orlenko-9674507/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Grab Wiki data/Получение данных с Wiki</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Vladimir Orlenko </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 31, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>Для работы с текстом необходимо иметь некий массив текста достаточно болтшого размера. И таким источником является Wiki. Так что рассмотрим, как мы можем забрать эту информацию.</p>
+<p>#Presets</p>
+<p>Для парсинга xml будем использовать <a href="https://pythonhosted.org/mwxml/">mwxml</a></p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:7783,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281344064,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="66dee0e3-acb5-4666-d164-dbe5a1627f5d" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install mwxml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting mwxml
+  Downloading mwxml-0.3.3-py2.py3-none-any.whl (32 kB)
+Requirement already satisfied: jsonschema&gt;=2.5.1 in /usr/local/lib/python3.10/dist-packages (from mwxml) (4.3.3)
+Collecting mwcli&gt;=0.0.2
+  Downloading mwcli-0.0.3-py2.py3-none-any.whl (8.4 kB)
+Collecting mwtypes&gt;=0.3.0
+  Downloading mwtypes-0.3.2-py2.py3-none-any.whl (21 kB)
+Collecting para&gt;=0.0.1
+  Downloading para-0.0.8-py3-none-any.whl (6.5 kB)
+Requirement already satisfied: attrs&gt;=17.4.0 in /usr/local/lib/python3.10/dist-packages (from jsonschema&gt;=2.5.1-&gt;mwxml) (23.1.0)
+Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,&gt;=0.14.0 in /usr/local/lib/python3.10/dist-packages (from jsonschema&gt;=2.5.1-&gt;mwxml) (0.19.3)
+Collecting docopt
+  Downloading docopt-0.6.2.tar.gz (25 kB)
+  Preparing metadata (setup.py) ... done
+Collecting jsonable&gt;=0.3.0
+  Downloading jsonable-0.3.1-py2.py3-none-any.whl (11 kB)
+Building wheels for collected packages: docopt
+  Building wheel for docopt (setup.py) ... done
+  Created wheel for docopt: filename=docopt-0.6.2-py2.py3-none-any.whl size=13721 sha256=8d1e1b91a4aa4e2dc654c13b8d0e48a4a2cc324abf7f74941928479217c14d28
+  Stored in directory: /root/.cache/pip/wheels/fc/ab/d4/5da2067ac95b36618c629a5f93f809425700506f72c9732fac
+Successfully built docopt
+Installing collected packages: para, jsonable, docopt, mwtypes, mwcli, mwxml
+Successfully installed docopt-0.6.2 jsonable-0.3.1 mwcli-0.0.3 mwtypes-0.3.2 mwxml-0.3.3 para-0.0.8</code></pre>
+</div>
+</div>
+<p>Чтобы создать вики-представление текста, мы передаем текст статьи из Википедии в mwparserfromhell.</p>
+<p>Чтобы выяснить все, что вы можете сделать с mwparserfromhell, <a href="https://mwparserfromhell.readthedocs.io/en/latest/">прочитайте документацию</a>.</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:4843,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281348901,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="a4b1c092-d075-4856-f342-ad6096668b61" data-execution_count="6">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install mwparserfromhell</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting mwparserfromhell
+  Downloading mwparserfromhell-0.6.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (190 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 190.6/190.6 kB 14.0 MB/s eta 0:00:00
+Installing collected packages: mwparserfromhell
+Successfully installed mwparserfromhell-0.6.4</code></pre>
+</div>
+</div>
+<p>Монтируем диск Google</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data:image/png;base64,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.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image.png</figcaption>
+</figure>
+</div>
+<p>#Form candidate list</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:1341,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281352410,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="7">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parsing HTML</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># File system management</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:337,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281360099,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="5bc90520-b1a0-4498-bbeb-f66eb870e700" data-execution_count="8">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">'https://dumps.wikimedia.org/ruwiki/'</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> requests.get(base_url).text</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>soup_index <span class="op">=</span> BeautifulSoup(index, <span class="st">'html.parser'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the links that are dates of dumps</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>dumps <span class="op">=</span> [a[<span class="st">'href'</span>] <span class="cf">for</span> a <span class="kw">in</span> soup_index.find_all(<span class="st">'a'</span>) <span class="cf">if</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>         a.has_attr(<span class="st">'href'</span>)]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>dumps</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>['../',
+ '20230120/',
+ '20230201/',
+ '20230220/',
+ '20230301/',
+ '20230320/',
+ '20230401/',
+ '20230420/',
+ '20230501/',
+ 'latest/']</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:768,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281376373,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="b8c9f810-ca78-4075-e161-5f2bef56038e" data-execution_count="9">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get lastest dump</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dump_url <span class="op">=</span> base_url <span class="op">+</span> <span class="st">'latest/'</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve the html</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>dump_html <span class="op">=</span> requests.get(dump_url).text</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>dump_html[:<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>'&lt;html&gt;\r\n&lt;h'</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:4,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281379278,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="7072c899-1237-41b9-b2cd-f27ed8fef7e2" data-execution_count="10">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a soup</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>soup_dump <span class="op">=</span> BeautifulSoup(dump_html, <span class="st">'html.parser'</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Find li elements with the class file</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>soup_dump.find_all(<span class="st">'a'</span>, href<span class="op">=</span><span class="va">True</span>, limit <span class="op">=</span> <span class="dv">10</span>)[:<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>[&lt;a href="../"&gt;../&lt;/a&gt;,
+ &lt;a href="ruwiki-latest-abstract.xml.gz"&gt;ruwiki-latest-abstract.xml.gz&lt;/a&gt;,
+ &lt;a href="ruwiki-latest-abstract.xml.gz-rss.xml"&gt;ruwiki-latest-abstract.xml.gz-rss.xml&lt;/a&gt;,
+ &lt;a href="ruwiki-latest-abstract1.xml.gz"&gt;ruwiki-latest-abstract1.xml.gz&lt;/a&gt;]</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:435,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281382591,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="216cf650-dbe2-4dc0-be2a-9b193137322a" data-execution_count="11">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of dumps</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> soup_dump.find_all(<span class="st">'a'</span>, href<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> <span class="bu">file</span>[<span class="st">'href'</span>]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'pages-articles'</span> <span class="kw">in</span> text:</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>ruwiki-latest-pages-articles-multistream-index.txt.bz2
+ruwiki-latest-pages-articles-multistream-index.txt.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index1.txt-p1p224167.bz2
+ruwiki-latest-pages-articles-multistream-index1.txt-p1p224167.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index2.txt-p224168p1042043.bz2
+ruwiki-latest-pages-articles-multistream-index2.txt-p224168p1042043.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index3.txt-p1042044p2198269.bz2
+ruwiki-latest-pages-articles-multistream-index3.txt-p1042044p2198269.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index4.txt-p2198270p3698269.bz2
+ruwiki-latest-pages-articles-multistream-index4.txt-p2198270p3698269.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index4.txt-p3698270p3835772.bz2
+ruwiki-latest-pages-articles-multistream-index4.txt-p3698270p3835772.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index5.txt-p3835773p5335772.bz2
+ruwiki-latest-pages-articles-multistream-index5.txt-p3835773p5335772.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index5.txt-p5335773p6585765.bz2
+ruwiki-latest-pages-articles-multistream-index5.txt-p5335773p6585765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index6.txt-p6585766p8085765.bz2
+ruwiki-latest-pages-articles-multistream-index6.txt-p6585766p8085765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index6.txt-p8085766p9585765.bz2
+ruwiki-latest-pages-articles-multistream-index6.txt-p8085766p9585765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index6.txt-p9585766p10177887.bz2
+ruwiki-latest-pages-articles-multistream-index6.txt-p9585766p10177887.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream-index6.txt-p9585766p10192397.bz2
+ruwiki-latest-pages-articles-multistream-index6.txt-p9585766p10192397.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream.xml.bz2
+ruwiki-latest-pages-articles-multistream.xml.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream1.xml-p1p224167.bz2
+ruwiki-latest-pages-articles-multistream1.xml-p1p224167.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream2.xml-p224168p1042043.bz2
+ruwiki-latest-pages-articles-multistream2.xml-p224168p1042043.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream3.xml-p1042044p2198269.bz2
+ruwiki-latest-pages-articles-multistream3.xml-p1042044p2198269.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream4.xml-p2198270p3698269.bz2
+ruwiki-latest-pages-articles-multistream4.xml-p2198270p3698269.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream4.xml-p3698270p3835772.bz2
+ruwiki-latest-pages-articles-multistream4.xml-p3698270p3835772.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream5.xml-p3835773p5335772.bz2
+ruwiki-latest-pages-articles-multistream5.xml-p3835773p5335772.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream5.xml-p5335773p6585765.bz2
+ruwiki-latest-pages-articles-multistream5.xml-p5335773p6585765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream6.xml-p6585766p8085765.bz2
+ruwiki-latest-pages-articles-multistream6.xml-p6585766p8085765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream6.xml-p8085766p9585765.bz2
+ruwiki-latest-pages-articles-multistream6.xml-p8085766p9585765.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream6.xml-p9585766p10177887.bz2
+ruwiki-latest-pages-articles-multistream6.xml-p9585766p10177887.bz2-rss.xml
+ruwiki-latest-pages-articles-multistream6.xml-p9585766p10192397.bz2
+ruwiki-latest-pages-articles-multistream6.xml-p9585766p10192397.bz2-rss.xml
+ruwiki-latest-pages-articles.xml.bz2
+ruwiki-latest-pages-articles.xml.bz2-rss.xml
+ruwiki-latest-pages-articles1.xml-p1p224167.bz2
+ruwiki-latest-pages-articles1.xml-p1p224167.bz2-rss.xml
+ruwiki-latest-pages-articles2.xml-p224168p1042043.bz2
+ruwiki-latest-pages-articles2.xml-p224168p1042043.bz2-rss.xml
+ruwiki-latest-pages-articles3.xml-p1042044p2198269.bz2
+ruwiki-latest-pages-articles3.xml-p1042044p2198269.bz2-rss.xml
+ruwiki-latest-pages-articles4.xml-p2198270p3698269.bz2
+ruwiki-latest-pages-articles4.xml-p2198270p3698269.bz2-rss.xml
+ruwiki-latest-pages-articles4.xml-p3698270p3835772.bz2
+ruwiki-latest-pages-articles4.xml-p3698270p3835772.bz2-rss.xml
+ruwiki-latest-pages-articles5.xml-p3835773p5335772.bz2
+ruwiki-latest-pages-articles5.xml-p3835773p5335772.bz2-rss.xml
+ruwiki-latest-pages-articles5.xml-p5335773p6585765.bz2
+ruwiki-latest-pages-articles5.xml-p5335773p6585765.bz2-rss.xml
+ruwiki-latest-pages-articles6.xml-p6585766p8085765.bz2
+ruwiki-latest-pages-articles6.xml-p6585766p8085765.bz2-rss.xml
+ruwiki-latest-pages-articles6.xml-p8085766p9585765.bz2
+ruwiki-latest-pages-articles6.xml-p8085766p9585765.bz2-rss.xml
+ruwiki-latest-pages-articles6.xml-p9585766p10177887.bz2
+ruwiki-latest-pages-articles6.xml-p9585766p10177887.bz2-rss.xml
+ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2
+ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2-rss.xml</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:579,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281387195,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="bdb12973-313c-4f73-e675-f77cd44c1421" data-execution_count="12">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter files</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> []</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Search through all files</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> soup_dump.find_all(<span class="st">'a'</span>, href<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> <span class="bu">file</span>[<span class="st">'href'</span>]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Select the relevant files</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'pages-articles'</span> <span class="kw">in</span> text <span class="kw">and</span> <span class="st">'bz2-rss'</span> <span class="kw">not</span> <span class="kw">in</span> text:</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        files.append((text.split()[<span class="dv">0</span>], text.split()[<span class="dv">1</span>:]))</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>files[:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>[('ruwiki-latest-pages-articles-multistream-index.txt.bz2', []),
+ ('ruwiki-latest-pages-articles-multistream-index1.txt-p1p224167.bz2', []),
+ ('ruwiki-latest-pages-articles-multistream-index2.txt-p224168p1042043.bz2',
+  []),
+ ('ruwiki-latest-pages-articles-multistream-index3.txt-p1042044p2198269.bz2',
+  []),
+ ('ruwiki-latest-pages-articles-multistream-index4.txt-p2198270p3698269.bz2',
+  [])]</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:1242,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281391011,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="fe4b61d6-fc96-429b-af50-2c21e8a928fa" data-execution_count="13">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Form list of files for download</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Select multi-volume dump with articles</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>files_to_download <span class="op">=</span> [<span class="bu">file</span>[<span class="dv">0</span>] <span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> files <span class="cf">if</span> <span class="st">'.xml-p'</span> <span class="kw">in</span> <span class="bu">file</span>[<span class="dv">0</span>]]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>files_to_download[<span class="op">-</span><span class="dv">5</span>:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>['ruwiki-latest-pages-articles5.xml-p5335773p6585765.bz2',
+ 'ruwiki-latest-pages-articles6.xml-p6585766p8085765.bz2',
+ 'ruwiki-latest-pages-articles6.xml-p8085766p9585765.bz2',
+ 'ruwiki-latest-pages-articles6.xml-p9585766p10177887.bz2',
+ 'ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2']</code></pre>
+</div>
+</div>
+<p>#Download files of Wiki Data</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:391,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281398546,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="14">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras.utils <span class="im">import</span> get_file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>###Parameters</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:310,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281402379,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="15">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#%%writefile parameters.py</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>keras_home <span class="op">=</span> <span class="st">'/content/drive/MyDrive/Data/Wiki/articles/'</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>datasets <span class="op">=</span> <span class="st">'datasets/'</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>archives <span class="op">=</span> <span class="st">'archive/'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>%load parameters.py</p>
+<p>После выполнения этой команды в ячейке появится содержимое файла parameters.py. Чтобы исполнить этот код, нужно удалить символы комментария (#) перед нужными строками и нажать Shift+Enter.</p>
+<hr>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:17264,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683285871172,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="71352914-b5bd-486d-948f-9825e5450857" data-execution_count="73">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#%%writefile processfiles.py</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> []</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>file_info <span class="op">=</span> []</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate through each file</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> files_to_download:</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> keras_home <span class="op">+</span>datasets<span class="op">+</span> <span class="bu">file</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check to see if the path exists (if the file is already downloaded)</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.path.exists(path): <span class="co">#(keras_home + file):</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Downloading'</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If not, download the file</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>        data_paths.append(get_file(origin <span class="op">=</span> dump_url<span class="op">+</span><span class="bu">file</span>, cache_dir<span class="op">=</span> keras_home))</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Find the file size in MB</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        file_size <span class="op">=</span> os.stat(path).st_size <span class="op">/</span> <span class="fl">1e6</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Find the number of articles</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        file_articles <span class="op">=</span> <span class="bu">int</span>(<span class="bu">file</span>.split(<span class="st">'p'</span>)[<span class="op">-</span><span class="dv">1</span>].split(<span class="st">'.'</span>)[<span class="op">-</span><span class="dv">2</span>]) <span class="op">-</span> <span class="bu">int</span>(<span class="bu">file</span>.split(<span class="st">'p'</span>)[<span class="op">-</span><span class="dv">2</span>])</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        file_info.append((<span class="bu">file</span>, file_size, file_articles))</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If the file is already downloaded find some information</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        data_paths.append(path)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Find the file size in MB</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>        file_size <span class="op">=</span> os.stat(path).st_size <span class="op">/</span> <span class="fl">1e6</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Find the number of articles</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>        file_number <span class="op">=</span> <span class="bu">int</span>(<span class="bu">file</span>.split(<span class="st">'p'</span>)[<span class="op">-</span><span class="dv">1</span>].split(<span class="st">'.'</span>)[<span class="op">-</span><span class="dv">2</span>]) <span class="op">-</span> <span class="bu">int</span>(<span class="bu">file</span>.split(<span class="st">'p'</span>)[<span class="op">-</span><span class="dv">2</span>])</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>        file_info.append((<span class="bu">file</span>, file_size, file_number))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Downloading
+Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pages-articles-multistream4.xml-p3698270p3835772.bz2
+68562895/68562895 [==============================] - 17s 0us/step</code></pre>
+</div>
+</div>
+<p>Какой самый большой файл? Мы можем использовать sorted для сортировки по размеру файла.Какой самый большой файл? Мы можем использовать sorted для сортировки по размеру файла.</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:284,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683287296142,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="af59cf72-9405-4421-b8f9-428c2abe9fd7" data-execution_count="79">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>(file_info, key <span class="op">=</span> <span class="kw">lambda</span> x: x[<span class="dv">1</span>], reverse <span class="op">=</span> <span class="va">True</span>)[:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="79">
+<pre><code>[('ruwiki-latest-pages-articles-multistream5.xml-p3835773p5335772.bz2',
+  788.431722,
+  1499999),
+ ('ruwiki-latest-pages-articles-multistream4.xml-p2198270p3698269.bz2',
+  760.265323,
+  1499999),
+ ('ruwiki-latest-pages-articles5.xml-p3835773p5335772.bz2',
+  756.775388,
+  1499999),
+ ('ruwiki-latest-pages-articles4.xml-p2198270p3698269.bz2',
+  733.609441,
+  1499999),
+ ('ruwiki-latest-pages-articles-multistream6.xml-p6585766p8085765.bz2',
+  727.746752,
+  1499999)]</code></pre>
+</div>
+</div>
+<p>Эти размеры указаны в МБ. Похоже, что самые большие файлы сжаты примерно на 700 МБ.Эти размеры указаны в МБ. Похоже, что самые большие файлы сжаты примерно на 700 МБ.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>(file_info, key <span class="op">=</span> <span class="kw">lambda</span> x: x[<span class="dv">2</span>], reverse <span class="op">=</span> <span class="va">True</span>)[:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Опять же, я не знаю, что означают числа после p, но самая распространенная разница между первым и вторым — 1_500_000.Опять же, я не знаю, что означают числа после p, но самая распространенная разница между первым и вторым — 1_500_000.</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:509,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281422813,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="6c7b6006-f98c-4818-ad15-76200d12ab6a" data-execution_count="19">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'There are </span><span class="sc">{</span><span class="bu">len</span>(file_info)<span class="sc">}</span><span class="ss"> partitions.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 22 partitions.</code></pre>
+</div>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:741,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683286130037,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="8963b83b-efd1-410c-a95d-c37ff7c1bb6f" data-execution_count="78">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw figure</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>file_df <span class="op">=</span> pd.DataFrame(file_info, columns <span class="op">=</span> [<span class="st">'file'</span>, <span class="st">'size (MB)'</span>, <span class="st">'articles'</span>]).set_index(<span class="st">'file'</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>file_df[<span class="st">'size (MB)'</span>].plot.bar(color <span class="op">=</span> <span class="st">'red'</span>, figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">6</span>))<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="GrabData_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<hr>
+<p>#Parse file</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:395,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281436298,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="552de5ec-8f1c-4c53-811d-bb0f23218508" data-execution_count="22">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Take shorttest dump</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>data_path <span class="op">=</span> data_paths[<span class="dv">4</span>]</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># File with that will work</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>data_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>'/content/drive/MyDrive/Data/Wiki/articles/datasets/ruwiki-latest-pages-articles-multistream4.xml-p3698270p3835772.bz2'</code></pre>
+</div>
+</div>
+<p>##Parsing XML</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:329,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281440620,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="23">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xml.sax</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> WikiXmlHandler(xml.sax.handler.ContentHandler):</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Content handler for Wiki XML data using SAX"""</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        xml.sax.handler.ContentHandler.<span class="fu">__init__</span>(<span class="va">self</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._buffer <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._values <span class="op">=</span> {}</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._current_tag <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._pages <span class="op">=</span> []</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> characters(<span class="va">self</span>, content):</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Characters between opening and closing tags"""</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>._current_tag:</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._buffer.append(content)</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> startElement(<span class="va">self</span>, name, attrs):</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Opening tag of element"""</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="kw">in</span> (<span class="st">'title'</span>, <span class="st">'text'</span>, <span class="st">'timestamp'</span>):</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._current_tag <span class="op">=</span> name</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._buffer <span class="op">=</span> []</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>            <span class="co">#print(f'open tag {name} \n')</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> endElement(<span class="va">self</span>, name):</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Closing tag of element"""</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="op">==</span> <span class="va">self</span>._current_tag:</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._values[name] <span class="op">=</span> <span class="st">' '</span>.join(<span class="va">self</span>._buffer)</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="op">==</span> <span class="st">'page'</span>:</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._pages.append((<span class="va">self</span>._values[<span class="st">'title'</span>], <span class="va">self</span>._values[<span class="st">'text'</span>]))</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print(f'close tag {name} \n')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>##Parsing Articles</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:526,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281433804,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="21">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:20324,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281781954,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="40">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Object for handling xml</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>handler <span class="op">=</span> WikiXmlHandler()</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parsing object</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>parser <span class="op">=</span> xml.sax.make_parser()</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>parser.setContentHandler(handler)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, line <span class="kw">in</span> <span class="bu">enumerate</span>(subprocess.Popen([<span class="st">'bzcat'</span>], </span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                         stdin <span class="op">=</span> <span class="bu">open</span>(data_path), </span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>                         stdout <span class="op">=</span> subprocess.PIPE).stdout):</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    parser.feed(line)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Stop when 50 articles have been found</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co">#    if len(handler._pages) &gt; 50:</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="co">#        break</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:634,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683282409789,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="48">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parseArticles(data_path):</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Object for handling xml</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  handler <span class="op">=</span> WikiXmlHandler()</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Parsing object</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  parser <span class="op">=</span> xml.sax.make_parser()</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  parser.setContentHandler(handler)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i, line <span class="kw">in</span> <span class="bu">enumerate</span>(subprocess.Popen([<span class="st">'bzcat'</span>], </span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                         stdin <span class="op">=</span> <span class="bu">open</span>(data_path), </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                         stdout <span class="op">=</span> subprocess.PIPE).stdout):</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    parser.feed(line)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> handler</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:429,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281520882,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="30">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mwparserfromhell </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:2,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281523175,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="31">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> process_article(title, text, timestamp):</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Process a wikipedia article"""</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create a parsing object</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    wikicode <span class="op">=</span> mwparserfromhell.parse(text)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (title, wikicode.strip_code().strip(), timestamp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>##Process Bulk Pages</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:484,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281456920,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="26">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:318,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281459519,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="27">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>stopTitle<span class="op">=</span>(<span class="st">'Файл:'</span>,<span class="st">'Категория:'</span>,<span class="st">'Википедия:'</span>,<span class="st">'MediaWiki:'</span>,<span class="st">'Шаблон:'</span>,<span class="st">'Портал:'</span>,<span class="st">'Проект:'</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>stopText<span class="op">=</span>(<span class="st">'перенаправление'</span>,<span class="st">'REDIRECT'</span>,<span class="st">'redirect'</span>,<span class="st">'Redirect'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>не предпочтительный способ выгрузки</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:291,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281461468,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="28">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pocessBundleZip(pages, archive_name <span class="op">=</span> <span class="st">'archive.zip'</span>):</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Save exctacted wikipedia article in zip file"""</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">with</span> zipfile.ZipFile(archive_name, mode<span class="op">=</span><span class="st">"a"</span>) <span class="im">as</span> archive:</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> page_no,page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>      title, wikitext,_ <span class="op">=</span> process_article(pages[page_no][<span class="dv">0</span>],pages[page_no][<span class="dv">1</span>],<span class="va">None</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="kw">not</span> title.startswith(stopTitle):</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> wikitext.startswith(stopText):</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>          fname <span class="op">=</span> title.replace(<span class="st">', '</span>,<span class="st">' '</span>).replace(<span class="st">'/'</span>,<span class="st">'-'</span>)<span class="op">+</span><span class="st">'.txt'</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>          text <span class="op">=</span> wikitext.replace(<span class="st">'&lt; ref &gt;  &lt; /ref &gt;'</span>,<span class="st">''</span>).replace(<span class="st">'&lt; ref &gt;'</span>,<span class="st">'('</span>).replace(<span class="st">'&lt; /ref &gt;'</span>,<span class="st">')'</span>).replace(<span class="st">'  .'</span>,<span class="st">'.'</span>).replace(<span class="st">'  ,'</span>,<span class="st">','</span>).replace(<span class="st">' .'</span>,<span class="st">'.'</span>)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>          <span class="cf">with</span> archive.<span class="bu">open</span>(fname, <span class="st">"w"</span>) <span class="im">as</span> new_file:</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>            new_file.write(<span class="bu">bytes</span>(text,<span class="st">'utf-8'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>предпочтительный способ выгрузки</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:981,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683283342322,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="55">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pocessBundleBZ2(pages, archive_name <span class="op">=</span> <span class="st">'archive.bz2'</span>):</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Save exctacted wikipedia article in bzip file"""</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">with</span> zipfile.ZipFile(archive_name, mode<span class="op">=</span><span class="st">"a"</span>, compression<span class="op">=</span>zipfile.ZIP_BZIP2) <span class="im">as</span> archive:</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> page_no,page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>      title, wikitext,_ <span class="op">=</span> process_article(pages[page_no][<span class="dv">0</span>],pages[page_no][<span class="dv">1</span>],<span class="va">None</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="kw">not</span> title.startswith(stopTitle):</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> wikitext.startswith(stopText):</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>          fname <span class="op">=</span> title.replace(<span class="st">', '</span>,<span class="st">' '</span>).replace(<span class="st">'/'</span>,<span class="st">'-'</span>)<span class="op">+</span><span class="st">'.txt'</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>          text <span class="op">=</span> wikitext.replace(<span class="st">'&lt; ref &gt;  &lt; /ref &gt;'</span>,<span class="st">''</span>).replace(<span class="st">'&lt; ref &gt;'</span>,<span class="st">'('</span>).replace(<span class="st">'&lt; /ref &gt;'</span>,<span class="st">')'</span>).replace(<span class="st">'  .'</span>,<span class="st">'.'</span>).replace(<span class="st">'  ,'</span>,<span class="st">','</span>).replace(<span class="st">' .'</span>,<span class="st">'.'</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>          <span class="cf">with</span> archive.<span class="bu">open</span>(fname, <span class="st">"w"</span>) <span class="im">as</span> new_file:</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>            new_file.write(<span class="bu">bytes</span>(text,<span class="st">'utf-8'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:295168,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683283640778,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="56">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Process Articles</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>handler <span class="op">=</span> parseArticles(data_path)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get dump name</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> os.path.splitext(os.path.basename(data_path))[<span class="dv">0</span>]</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set Archive name</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>archName <span class="op">=</span> keras_home <span class="op">+</span> archives <span class="op">+</span> filename <span class="op">+</span> <span class="st">'.bz2'</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Save processed articles in archive</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>pocessBundleBZ2(handler._pages, archName)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check created file</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(archName, mode<span class="op">=</span><span class="st">"r"</span>,compression<span class="op">=</span>zipfile.ZIP_BZIP2) <span class="im">as</span> archive:</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#archive.printdir()</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">"------"</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  text <span class="op">=</span> archive.read(<span class="st">"Джимасар.txt"</span>).decode(encoding<span class="op">=</span><span class="st">"utf-8"</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page_no,page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>      title, wikitext,_ <span class="op">=</span> process_article(pages[page_no][<span class="dv">0</span>],pages[page_no][<span class="dv">1</span>],<span class="va">None</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
