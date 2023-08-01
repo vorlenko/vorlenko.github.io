@@ -180,8 +180,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>Для работы с текстом необходимо иметь некий массив текста достаточно болтшого размера. И таким источником является Wiki. Так что рассмотрим, как мы можем забрать эту информацию.</p>
-<p>#Presets</p>
+<p>Для работы с текстом необходимо иметь некий массив текста достаточно большого размера. И таким источником является Wiki. Так что рассмотрим, как мы можем забрать эту информацию.</p>
+<section id="presets" class="level1">
+<h1>Presets</h1>
 <p>Для парсинга xml будем использовать <a href="https://pythonhosted.org/mwxml/">mwxml</a></p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:7783,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281344064,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="66dee0e3-acb5-4666-d164-dbe5a1627f5d" data-execution_count="5">
 <details>
@@ -238,7 +239,10 @@ Successfully installed mwparserfromhell-0.6.4</code></pre>
 <figcaption class="figure-caption">image.png</figcaption>
 </figure>
 </div>
-<p>#Form candidate list</p>
+</section>
+<section id="form-candidate-list" class="level1">
+<h1>Form candidate list</h1>
+<p>Загружать данные будем из дампов Wiki</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:1341,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281352410,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="7">
 <details>
 <summary>Code</summary>
@@ -276,6 +280,7 @@ Successfully installed mwparserfromhell-0.6.4</code></pre>
  'latest/']</code></pre>
 </div>
 </div>
+<p>Выберем самый свежий дамп</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:768,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281376373,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="b8c9f810-ca78-4075-e161-5f2bef56038e" data-execution_count="9">
 <details>
 <summary>Code</summary>
@@ -306,6 +311,7 @@ Successfully installed mwparserfromhell-0.6.4</code></pre>
  &lt;a href="ruwiki-latest-abstract1.xml.gz"&gt;ruwiki-latest-abstract1.xml.gz&lt;/a&gt;]</code></pre>
 </div>
 </div>
+<p>Получим список дампов</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:435,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281382591,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="216cf650-dbe2-4dc0-be2a-9b193137322a" data-execution_count="11">
 <details>
 <summary>Code</summary>
@@ -417,6 +423,7 @@ ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2-rss.xml</code></pre>
   [])]</code></pre>
 </div>
 </div>
+<p>Сформируем список файлов для загрузки</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:1242,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281391011,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="fe4b61d6-fc96-429b-af50-2c21e8a928fa" data-execution_count="13">
 <details>
 <summary>Code</summary>
@@ -433,7 +440,10 @@ ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2-rss.xml</code></pre>
  'ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2']</code></pre>
 </div>
 </div>
-<p>#Download files of Wiki Data</p>
+</section>
+<section id="download-files-of-wiki-data" class="level1">
+<h1>Download files of Wiki Data</h1>
+<p>Для загрузки фалов воспользуемя <code>get_file</code> утилитой из библиотеки <code>keras</code></p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:391,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281398546,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="14">
 <details>
 <summary>Code</summary>
@@ -441,7 +451,9 @@ ruwiki-latest-pages-articles6.xml-p9585766p10192397.bz2-rss.xml</code></pre>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras.utils <span class="im">import</span> get_file</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>###Parameters</p>
+<section id="parameters" class="level3">
+<h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
+<p>В переменной <code>keras_home</code> укажем, куда будут сохраняться файлы<br> в переменной <code>datasets</code> укажем папку для хранения датасетов<br> в переменной <code>archives</code> укажем папку для хранения архивов</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:310,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281402379,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="15">
 <details>
 <summary>Code</summary>
@@ -494,7 +506,7 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 68562895/68562895 [==============================] - 17s 0us/step</code></pre>
 </div>
 </div>
-<p>Какой самый большой файл? Мы можем использовать sorted для сортировки по размеру файла.Какой самый большой файл? Мы можем использовать sorted для сортировки по размеру файла.</p>
+<p>Какой самый большой файл? Мы можем использовать <code>sorted</code> для сортировки по размеру файла.Какой самый большой файл? Мы можем использовать <code>sorted</code> для сортировки по размеру файла.</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:284,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683287296142,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="af59cf72-9405-4421-b8f9-428c2abe9fd7" data-execution_count="79">
 <details>
 <summary>Code</summary>
@@ -525,7 +537,7 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>(file_info, key <span class="op">=</span> <span class="kw">lambda</span> x: x[<span class="dv">2</span>], reverse <span class="op">=</span> <span class="va">True</span>)[:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Опять же, я не знаю, что означают числа после p, но самая распространенная разница между первым и вторым — 1_500_000.Опять же, я не знаю, что означают числа после p, но самая распространенная разница между первым и вторым — 1_500_000.</p>
+<p>Опять же, я не знаю, что означают числа после p, но самая распространенная разница между первым и вторым — 1_500_000.</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:509,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281422813,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="6c7b6006-f98c-4818-ad15-76200d12ab6a" data-execution_count="19">
 <details>
 <summary>Code</summary>
@@ -550,7 +562,10 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 </div>
 </div>
 <hr>
-<p>#Parse file</p>
+</section>
+</section>
+<section id="parse-file" class="level1">
+<h1>Parse file</h1>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:395,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281436298,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="552de5ec-8f1c-4c53-811d-bb0f23218508" data-execution_count="22">
 <details>
 <summary>Code</summary>
@@ -563,7 +578,8 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 <pre><code>'/content/drive/MyDrive/Data/Wiki/articles/datasets/ruwiki-latest-pages-articles-multistream4.xml-p3698270p3835772.bz2'</code></pre>
 </div>
 </div>
-<p>##Parsing XML</p>
+<section id="parsing-xml" class="level2">
+<h2 class="anchored" data-anchor-id="parsing-xml">Parsing XML</h2>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:329,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281440620,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="23">
 <details>
 <summary>Code</summary>
@@ -600,7 +616,9 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 <span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print(f'close tag {name} \n')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>##Parsing Articles</p>
+</section>
+<section id="parsing-articles" class="level2">
+<h2 class="anchored" data-anchor-id="parsing-articles">Parsing Articles</h2>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:526,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281433804,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="21">
 <details>
 <summary>Code</summary>
@@ -662,7 +680,10 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (title, wikicode.strip_code().strip(), timestamp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>##Process Bulk Pages</p>
+</section>
+<section id="process-bulk-pages" class="level2">
+<h2 class="anchored" data-anchor-id="process-bulk-pages">Process Bulk Pages</h2>
+<p>Будем сохранять распарсеные файлы в один большой архив, с которым проще иметь дело, чем с кучей мелких файлов</p>
 <div class="cell" data-executioninfo="{&quot;elapsed&quot;:484,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1683281456920,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-execution_count="26">
 <details>
 <summary>Code</summary>
@@ -745,6 +766,8 @@ Downloading data from https://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pa
 </div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
