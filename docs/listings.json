@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/post-with-code/SDXL_Demo.html",
       "/posts/welcome/PUG Dataset.html",
       "/posts/post-with-code/style transfers by TF.html",
       "/posts/post-with-code/HowToUseCopyCode.html",

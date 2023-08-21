@@ -34,5 +34,8 @@
   },
   "posts/welcome/PUG Dataset.qmd": {
     "PUG Dataset.html": "c9a91754"
+  },
+  "posts/post-with-code/SDXL_Demo.ipynb": {
+    "SDXL_Demo.html": "640f810a"
   }
 }
