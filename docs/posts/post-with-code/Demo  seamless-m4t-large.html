@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Vladimir Orlenko">
+<meta name="dcterms.date" content="2023-08-22">
+
+<title>ml-blog - Пример работы с seamless-m4t-large от Мета</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ml-blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/vorlenko" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/vladimir-orlenko-9674507/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Пример работы с seamless-m4t-large от Мета</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">text</div>
+                <div class="quarto-category">audio</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Vladimir Orlenko </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 22, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>Meta выпустила крутой нейропереводчик с поддержкой 100 языков. Он спокойно может перегнать текст в речь и наоборот. Из речи в речь тоже умеет.</p>
+<p>Интонации переданы неплохо. Это не стандартный робот-тараторщик, а вполне приятный искусственный интеллект с нормальным голосом.</p>
+<p>https://github.com/facebookresearch/seamless_communication/blob/main/README.md</p>
+<p><a href="https://huggingface.co/facebook/seamless-m4t-large">Source</a></p>
+<ul>
+<li>Speech-to-speech translation (S2ST)</li>
+<li>Speech-to-text translation (S2TT)</li>
+<li>Text-to-speech translation (T2ST)</li>
+<li>Text-to-text translation (T2TT)</li>
+<li>Automatic speech recognition (ASR)</li>
+</ul>
+<p>Модель <code>SeamlessM4T</code> в настоящее время доступна через пакет <code>seamless_communication</code></p>
+<p>Приступим к установке</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:13727,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692720888519,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="c640d107-d81f-410f-b2a1-bc892cf97599">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install fairseq2<span class="op">==</span><span class="fl">0.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Collecting fairseq2==0.1
+  Downloading fairseq2-0.1.0-py3-none-any.whl (162 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 162.3/162.3 kB 3.4 MB/s eta 0:00:00
+Collecting fairseq2n==0.1.0 (from fairseq2==0.1)
+  Downloading fairseq2n-0.1.0-cp310-cp310-manylinux_2_17_x86_64.whl (2.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.3/2.3 MB 11.5 MB/s eta 0:00:00
+Collecting jiwer~=3.0 (from fairseq2==0.1)
+  Downloading jiwer-3.0.2-py3-none-any.whl (21 kB)
+Requirement already satisfied: numpy~=1.23 in /usr/local/lib/python3.10/dist-packages (from fairseq2==0.1) (1.23.5)
+Collecting overrides~=7.3 (from fairseq2==0.1)
+  Downloading overrides-7.4.0-py3-none-any.whl (17 kB)
+Requirement already satisfied: packaging~=23.1 in /usr/local/lib/python3.10/dist-packages (from fairseq2==0.1) (23.1)
+Requirement already satisfied: pyyaml~=6.0 in /usr/local/lib/python3.10/dist-packages (from fairseq2==0.1) (6.0.1)
+Collecting sacrebleu~=2.3 (from fairseq2==0.1)
+  Downloading sacrebleu-2.3.1-py3-none-any.whl (118 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.9/118.9 kB 12.6 MB/s eta 0:00:00
+Requirement already satisfied: torch&gt;=1.12.1 in /usr/local/lib/python3.10/dist-packages (from fairseq2==0.1) (2.0.1+cu118)
+Collecting torcheval~=0.0.6 (from fairseq2==0.1)
+  Downloading torcheval-0.0.6-py3-none-any.whl (158 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 158.4/158.4 kB 15.4 MB/s eta 0:00:00
+Collecting tbb==2021.8 (from fairseq2n==0.1.0-&gt;fairseq2==0.1)
+  Downloading tbb-2021.8.0-py2.py3-none-manylinux1_x86_64.whl (4.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 21.8 MB/s eta 0:00:00
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (3.12.2)
+Requirement already satisfied: typing-extensions in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (4.7.1)
+Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (1.12)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (3.1)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (3.1.2)
+Requirement already satisfied: triton==2.0.0 in /usr/local/lib/python3.10/dist-packages (from torch&gt;=1.12.1-&gt;fairseq2==0.1) (2.0.0)
+Requirement already satisfied: cmake in /usr/local/lib/python3.10/dist-packages (from triton==2.0.0-&gt;torch&gt;=1.12.1-&gt;fairseq2==0.1) (3.27.2)
+Requirement already satisfied: lit in /usr/local/lib/python3.10/dist-packages (from triton==2.0.0-&gt;torch&gt;=1.12.1-&gt;fairseq2==0.1) (16.0.6)
+Requirement already satisfied: click&lt;9.0.0,&gt;=8.1.3 in /usr/local/lib/python3.10/dist-packages (from jiwer~=3.0-&gt;fairseq2==0.1) (8.1.7)
+Collecting rapidfuzz==2.13.7 (from jiwer~=3.0-&gt;fairseq2==0.1)
+  Downloading rapidfuzz-2.13.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 32.0 MB/s eta 0:00:00
+Collecting portalocker (from sacrebleu~=2.3-&gt;fairseq2==0.1)
+  Downloading portalocker-2.7.0-py2.py3-none-any.whl (15 kB)
+Requirement already satisfied: regex in /usr/local/lib/python3.10/dist-packages (from sacrebleu~=2.3-&gt;fairseq2==0.1) (2023.6.3)
+Requirement already satisfied: tabulate&gt;=0.8.9 in /usr/local/lib/python3.10/dist-packages (from sacrebleu~=2.3-&gt;fairseq2==0.1) (0.9.0)
+Collecting colorama (from sacrebleu~=2.3-&gt;fairseq2==0.1)
+  Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Requirement already satisfied: lxml in /usr/local/lib/python3.10/dist-packages (from sacrebleu~=2.3-&gt;fairseq2==0.1) (4.9.3)
+Collecting torchtnt&gt;=0.0.5 (from torcheval~=0.0.6-&gt;fairseq2==0.1)
+  Downloading torchtnt-0.2.0-py3-none-any.whl (111 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 111.0/111.0 kB 14.9 MB/s eta 0:00:00
+Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2023.6.0)
+Requirement already satisfied: tensorboard in /usr/local/lib/python3.10/dist-packages (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2.12.3)
+Requirement already satisfied: psutil in /usr/local/lib/python3.10/dist-packages (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (5.9.5)
+Collecting pyre-extensions (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1)
+  Downloading pyre_extensions-0.0.30-py3-none-any.whl (12 kB)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (67.7.2)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (4.66.1)
+Requirement already satisfied: MarkupSafe&gt;=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2-&gt;torch&gt;=1.12.1-&gt;fairseq2==0.1) (2.1.3)
+Requirement already satisfied: mpmath&gt;=0.19 in /usr/local/lib/python3.10/dist-packages (from sympy-&gt;torch&gt;=1.12.1-&gt;fairseq2==0.1) (1.3.0)
+Collecting typing-inspect (from pyre-extensions-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1)
+  Downloading typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)
+Requirement already satisfied: absl-py&gt;=0.4 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (1.4.0)
+Requirement already satisfied: grpcio&gt;=1.48.2 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (1.57.0)
+Requirement already satisfied: google-auth&lt;3,&gt;=1.6.3 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2.17.3)
+Requirement already satisfied: google-auth-oauthlib&lt;1.1,&gt;=0.5 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (1.0.0)
+Requirement already satisfied: markdown&gt;=2.6.8 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (3.4.4)
+Requirement already satisfied: protobuf&gt;=3.19.6 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (3.20.3)
+Requirement already satisfied: requests&lt;3,&gt;=2.21.0 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2.31.0)
+Requirement already satisfied: tensorboard-data-server&lt;0.8.0,&gt;=0.7.0 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (0.7.1)
+Requirement already satisfied: werkzeug&gt;=1.0.1 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2.3.7)
+Requirement already satisfied: wheel&gt;=0.26 in /usr/local/lib/python3.10/dist-packages (from tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (0.41.1)
+Requirement already satisfied: cachetools&lt;6.0,&gt;=2.0.0 in /usr/local/lib/python3.10/dist-packages (from google-auth&lt;3,&gt;=1.6.3-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (5.3.1)
+Requirement already satisfied: pyasn1-modules&gt;=0.2.1 in /usr/local/lib/python3.10/dist-packages (from google-auth&lt;3,&gt;=1.6.3-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (0.3.0)
+Requirement already satisfied: six&gt;=1.9.0 in /usr/local/lib/python3.10/dist-packages (from google-auth&lt;3,&gt;=1.6.3-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (1.16.0)
+Requirement already satisfied: rsa&lt;5,&gt;=3.1.4 in /usr/local/lib/python3.10/dist-packages (from google-auth&lt;3,&gt;=1.6.3-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (4.9)
+Requirement already satisfied: requests-oauthlib&gt;=0.7.0 in /usr/local/lib/python3.10/dist-packages (from google-auth-oauthlib&lt;1.1,&gt;=0.5-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (1.3.1)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /usr/local/lib/python3.10/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (3.2.0)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /usr/local/lib/python3.10/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (3.4)
+Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2.0.4)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (2023.7.22)
+Collecting mypy-extensions&gt;=0.3.0 (from typing-inspect-&gt;pyre-extensions-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1)
+  Downloading mypy_extensions-1.0.0-py3-none-any.whl (4.7 kB)
+Requirement already satisfied: pyasn1&lt;0.6.0,&gt;=0.4.6 in /usr/local/lib/python3.10/dist-packages (from pyasn1-modules&gt;=0.2.1-&gt;google-auth&lt;3,&gt;=1.6.3-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (0.5.0)
+Requirement already satisfied: oauthlib&gt;=3.0.0 in /usr/local/lib/python3.10/dist-packages (from requests-oauthlib&gt;=0.7.0-&gt;google-auth-oauthlib&lt;1.1,&gt;=0.5-&gt;tensorboard-&gt;torchtnt&gt;=0.0.5-&gt;torcheval~=0.0.6-&gt;fairseq2==0.1) (3.2.2)
+Installing collected packages: tbb, rapidfuzz, portalocker, overrides, mypy-extensions, colorama, typing-inspect, sacrebleu, jiwer, pyre-extensions, torchtnt, torcheval, fairseq2n, fairseq2
+  Attempting uninstall: tbb
+    Found existing installation: tbb 2021.10.0
+    Uninstalling tbb-2021.10.0:
+      Successfully uninstalled tbb-2021.10.0
+Successfully installed colorama-0.4.6 fairseq2-0.1.0 fairseq2n-0.1.0 jiwer-3.0.2 mypy-extensions-1.0.0 overrides-7.4.0 portalocker-2.7.0 pyre-extensions-0.0.30 rapidfuzz-2.13.7 sacrebleu-2.3.1 tbb-2021.8.0 torcheval-0.0.6 torchtnt-0.2.0 typing-inspect-0.9.0</code></pre>
+</div>
+</div>
+<p>Скачаем установщик с гитхаба</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:749,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692720889265,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="42efde7b-fcec-4aa5-f328-0baa3c81ab54">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget https:<span class="op">//</span>github.com<span class="op">/</span>facebookresearch<span class="op">/</span>seamless_communication<span class="op">/</span>archive<span class="op">/</span>refs<span class="op">/</span>heads<span class="op">/</span>main.<span class="bu">zip</span> <span class="op">&amp;&amp;</span> unzip main.<span class="bu">zip</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--2023-08-22 16:14:48--  https://github.com/facebookresearch/seamless_communication/archive/refs/heads/main.zip
+Resolving github.com (github.com)... 140.82.112.3
+Connecting to github.com (github.com)|140.82.112.3|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://codeload.github.com/facebookresearch/seamless_communication/zip/refs/heads/main [following]
+--2023-08-22 16:14:48--  https://codeload.github.com/facebookresearch/seamless_communication/zip/refs/heads/main
+Resolving codeload.github.com (codeload.github.com)... 140.82.114.9
+Connecting to codeload.github.com (codeload.github.com)|140.82.114.9|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [application/zip]
+Saving to: ‘main.zip’
+
+main.zip                [ &lt;=&gt;                ] 268.61K  --.-KB/s    in 0.05s   
+
+2023-08-22 16:14:48 (5.26 MB/s) - ‘main.zip’ saved [275053]
+
+Archive:  main.zip
+01c1042841f9bce66902eb2c7512dbdd71d42112
+   creating: seamless_communication-main/
+  inflating: seamless_communication-main/.gitignore  
+  inflating: seamless_communication-main/.pre-commit-config.yaml  
+  inflating: seamless_communication-main/CODE_OF_CONDUCT.md  
+  inflating: seamless_communication-main/CONTRIBUTING.md  
+  inflating: seamless_communication-main/LICENSE  
+  inflating: seamless_communication-main/README.md  
+   creating: seamless_communication-main/docs/
+   creating: seamless_communication-main/docs/m4t/
+  inflating: seamless_communication-main/docs/m4t/eval_README.md  
+  inflating: seamless_communication-main/docs/m4t/on_device_README.md  
+  inflating: seamless_communication-main/docs/m4t/seamless_align_README.md  
+ extracting: seamless_communication-main/requirements.txt  
+   creating: seamless_communication-main/scripts/
+   creating: seamless_communication-main/scripts/m4t/
+   creating: seamless_communication-main/scripts/m4t/finetune/
+  inflating: seamless_communication-main/scripts/m4t/finetune/README.md  
+ extracting: seamless_communication-main/scripts/m4t/finetune/__init__.py  
+  inflating: seamless_communication-main/scripts/m4t/finetune/dataloader.py  
+  inflating: seamless_communication-main/scripts/m4t/finetune/dataset.py  
+  inflating: seamless_communication-main/scripts/m4t/finetune/dist_utils.py  
+  inflating: seamless_communication-main/scripts/m4t/finetune/finetune.py  
+  inflating: seamless_communication-main/scripts/m4t/finetune/trainer.py  
+   creating: seamless_communication-main/scripts/m4t/predict/
+  inflating: seamless_communication-main/scripts/m4t/predict/README.md  
+  inflating: seamless_communication-main/scripts/m4t/predict/predict.py  
+ extracting: seamless_communication-main/seamlessM4T.png  
+  inflating: seamless_communication-main/setup.py  
+   creating: seamless_communication-main/src/
+   creating: seamless_communication-main/src/seamless_communication/
+  inflating: seamless_communication-main/src/seamless_communication/__init__.py  
+   creating: seamless_communication-main/src/seamless_communication/assets/
+  inflating: seamless_communication-main/src/seamless_communication/assets/__init__.py  
+   creating: seamless_communication-main/src/seamless_communication/assets/cards/
+  inflating: seamless_communication-main/src/seamless_communication/assets/cards/seamlessM4T_large.yaml  
+  inflating: seamless_communication-main/src/seamless_communication/assets/cards/seamlessM4T_medium.yaml  
+  inflating: seamless_communication-main/src/seamless_communication/assets/cards/unity_nllb-100.yaml  
+  inflating: seamless_communication-main/src/seamless_communication/assets/cards/unity_nllb-200.yaml  
+  inflating: seamless_communication-main/src/seamless_communication/assets/cards/vocoder_36langs.yaml  
+  inflating: seamless_communication-main/src/seamless_communication/assets/download_manager.py  
+  inflating: seamless_communication-main/src/seamless_communication/assets/store.py  
+   creating: seamless_communication-main/src/seamless_communication/datasets/
+ extracting: seamless_communication-main/src/seamless_communication/datasets/__init__.py  
+  inflating: seamless_communication-main/src/seamless_communication/datasets/datatypes.py  
+  inflating: seamless_communication-main/src/seamless_communication/datasets/huggingface.py  
+   creating: seamless_communication-main/src/seamless_communication/models/
+  inflating: seamless_communication-main/src/seamless_communication/models/__init__.py  
+   creating: seamless_communication-main/src/seamless_communication/models/inference/
+  inflating: seamless_communication-main/src/seamless_communication/models/inference/__init__.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/inference/translator.py  
+   creating: seamless_communication-main/src/seamless_communication/models/unity/
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/__init__.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/adaptor_block.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/builder.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/generator.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/loader.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/model.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/unity/unit_tokenizer.py  
+   creating: seamless_communication-main/src/seamless_communication/models/vocoder/
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/__init__.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/builder.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/codehifigan.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/hifigan.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/loader.py  
+  inflating: seamless_communication-main/src/seamless_communication/models/vocoder/vocoder.py  </code></pre>
+</div>
+</div>
+<p>Установим модель</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:6002,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692720895265,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="700e5eed-6fbc-4441-9604-8c905e045cda">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>cd seamless_communication<span class="op">-</span>main <span class="op">&amp;&amp;</span> pip install .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Processing /content/seamless_communication-main
+  Preparing metadata (setup.py) ... done
+Building wheels for collected packages: seamless-communication
+  Building wheel for seamless-communication (setup.py) ... done
+  Created wheel for seamless-communication: filename=seamless_communication-0.1-py3-none-any.whl size=42637 sha256=5a85f0ddcf4ee0fae9974e4f3a23fd3ffa4161c7161483073f94f3c4cd53d0e5
+  Stored in directory: /root/.cache/pip/wheels/73/7d/af/7c699ab4b97c66df074478227d6613ea29b940c26811beec2c
+Successfully built seamless-communication
+Installing collected packages: seamless-communication
+Successfully installed seamless-communication-0.1</code></pre>
+</div>
+</div>
+<p>Загрузим модель</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:168857,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692721064120,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="5b21a005-3780-4e5e-ee55-8d906069f275">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> seamless_communication.models.inference <span class="im">import</span> Translator</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize a Translator object with a multitask model, vocoder on the GPU.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>translator <span class="op">=</span> Translator(<span class="st">"seamlessM4T_large"</span>, vocoder_name_or_card<span class="op">=</span><span class="st">"vocoder_36langs"</span>, device<span class="op">=</span>torch.device(<span class="st">"cuda"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading the checkpoint of the model 'seamlessM4T_large'...
+100%|██████████| 10.7G/10.7G [01:42&lt;00:00, 111MB/s] 
+Downloading the tokenizer of the model 'seamlessM4T_large'...
+100%|██████████| 4.93M/4.93M [00:00&lt;00:00, 27.2MB/s]
+Downloading the checkpoint of the model 'vocoder_36langs'...
+100%|██████████| 160M/160M [00:03&lt;00:00, 52.4MB/s]</code></pre>
+</div>
+</div>
+<p>Установим пакет <code>torchaudio</code> для работы с аудифайлом</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:6471,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692722232905,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="4ad28115-77fe-4f02-c650-ac4426f81f17">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install torchaudio</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Requirement already satisfied: torchaudio in /usr/local/lib/python3.10/dist-packages (2.0.2+cu118)
+Requirement already satisfied: torch==2.0.1 in /usr/local/lib/python3.10/dist-packages (from torchaudio) (2.0.1+cu118)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (3.12.2)
+Requirement already satisfied: typing-extensions in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (4.7.1)
+Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (1.12)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (3.1)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (3.1.2)
+Requirement already satisfied: triton==2.0.0 in /usr/local/lib/python3.10/dist-packages (from torch==2.0.1-&gt;torchaudio) (2.0.0)
+Requirement already satisfied: cmake in /usr/local/lib/python3.10/dist-packages (from triton==2.0.0-&gt;torch==2.0.1-&gt;torchaudio) (3.27.2)
+Requirement already satisfied: lit in /usr/local/lib/python3.10/dist-packages (from triton==2.0.0-&gt;torch==2.0.1-&gt;torchaudio) (16.0.6)
+Requirement already satisfied: MarkupSafe&gt;=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2-&gt;torch==2.0.1-&gt;torchaudio) (2.1.3)
+Requirement already satisfied: mpmath&gt;=0.19 in /usr/local/lib/python3.10/dist-packages (from sympy-&gt;torch==2.0.1-&gt;torchaudio) (1.3.0)</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchaudio</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Все готово, и можно приступать к тестрованию</p>
+<p>Text-to-speech translation</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>txt_orig<span class="op">=</span><span class="st">"Machine learning (ML) is an umbrella term for solving problems for which development of algorithms by human programmers would be cost-prohibitive, and instead the problems are solved by helping machines 'discover' their 'own' algorithms, without needing to be explicitly told what to do by any human-developed algorithms. Recently, generative artificial neural networks have been able to surpass results of many previous approaches. Machine learning approaches have been applied to large language models, computer vision, speech recognition, email filtering, agriculture and medicine, where it is too costly to develop algorithms to perform the needed tasks."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># T2ST</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>translated_text, wav, sr <span class="op">=</span> translator.predict(txt_orig, <span class="st">"t2st"</span>, tgt_lang<span class="op">=</span><span class="st">"rus"</span>, src_lang<span class="op">=</span><span class="st">"eng"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the translated audio generation.</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>torchaudio.save(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>   <span class="st">"1.mp3"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    wav[<span class="dv">0</span>].cpu(),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    sample_rate<span class="op">=</span>sr,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Speech-to-speech translation (S2ST)</p>
+<p>Скачаем ролик с сайта BBC</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:1557,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692722833290,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="2bfd27a8-ef5d-46ea-a4a1-22debca6686e">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>wget https:<span class="op">//</span><span class="bu">open</span>.live.bbc.co.uk<span class="op">/</span>mediaselector<span class="op">/</span><span class="dv">6</span><span class="op">/</span>redir<span class="op">/</span>version<span class="op">/</span><span class="fl">2.0</span><span class="op">/</span>mediaset<span class="op">/</span>audio<span class="op">-</span>nondrm<span class="op">-</span>download<span class="op">/</span>proto<span class="op">/</span>https<span class="op">/</span>vpid<span class="op">/</span>p0g764lc.mp3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--2023-08-22 16:47:11--  https://open.live.bbc.co.uk/mediaselector/6/redir/version/2.0/mediaset/audio-nondrm-download/proto/https/vpid/p0g764lc.mp3
+Resolving open.live.bbc.co.uk (open.live.bbc.co.uk)... 212.58.249.158, 212.58.244.79
+Connecting to open.live.bbc.co.uk (open.live.bbc.co.uk)|212.58.249.158|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://flex.acast.com/ak/mpg_mp3_med/modav/bUnknown-916773b6-c2bc-4a5c-b42e-664b06980323_p0g764lc_cUnknown_1692263409705.mp3?__gda__=1692744432_bca2578e0a54e90f98dc6661649c8296 [following]
+--2023-08-22 16:47:12--  https://flex.acast.com/ak/mpg_mp3_med/modav/bUnknown-916773b6-c2bc-4a5c-b42e-664b06980323_p0g764lc_cUnknown_1692263409705.mp3?__gda__=1692744432_bca2578e0a54e90f98dc6661649c8296
+Resolving flex.acast.com (flex.acast.com)... 65.8.178.29, 65.8.178.19, 65.8.178.71, ...
+Connecting to flex.acast.com (flex.acast.com)|65.8.178.29|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://aod-pod-ww-live.akamaized.net/mpg_mp3_med/modav/bUnknown-916773b6-c2bc-4a5c-b42e-664b06980323_p0g764lc_cUnknown_1692263409705.mp3?__gda__=1692744432_bca2578e0a54e90f98dc6661649c8296 [following]
+--2023-08-22 16:47:12--  https://aod-pod-ww-live.akamaized.net/mpg_mp3_med/modav/bUnknown-916773b6-c2bc-4a5c-b42e-664b06980323_p0g764lc_cUnknown_1692263409705.mp3?__gda__=1692744432_bca2578e0a54e90f98dc6661649c8296
+Resolving aod-pod-ww-live.akamaized.net (aod-pod-ww-live.akamaized.net)... 23.49.5.46, 23.49.5.20
+Connecting to aod-pod-ww-live.akamaized.net (aod-pod-ww-live.akamaized.net)|23.49.5.46|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 6001291 (5.7M) [audio/mpeg]
+Saving to: ‘p0g764lc.mp3’
+
+p0g764lc.mp3        100%[===================&gt;]   5.72M  --.-KB/s    in 0.1s    
+
+2023-08-22 16:47:12 (58.7 MB/s) - ‘p0g764lc.mp3’ saved [6001291/6001291]
+</code></pre>
+</div>
+</div>
+<p>Установим библиотеку для работы с <code>ffmpeg</code></p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:5741,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692722965958,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="fc139e4f-e9ca-4e24-d057-7b84b5d44fc3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install ffmpeg<span class="op">-</span>python</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Collecting ffmpeg-python
+  Downloading ffmpeg_python-0.2.0-py3-none-any.whl (25 kB)
+Requirement already satisfied: future in /usr/local/lib/python3.10/dist-packages (from ffmpeg-python) (0.18.3)
+Installing collected packages: ffmpeg-python
+Successfully installed ffmpeg-python-0.2.0</code></pre>
+</div>
+</div>
+<p>Удалим предыдущий файл <code>wav</code></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>rm p0g764lc.wav</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Обрежем наш исходный файл, и сконвертируем его в формат <code>wav</code></p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:7,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692724086659,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="7eca3706-04f9-4bbe-f73c-d61347b62970">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>path_to_orig_audio<span class="op">=</span><span class="st">"p0g764lc.mp3"</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>path_to_input_audio<span class="op">=</span><span class="st">"p0g764lc.wav"</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ffmpeg</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    ffmpeg</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">input</span>(path_to_orig_audio).audio.<span class="bu">filter</span>(<span class="st">'atrim'</span>, duration<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    .output(path_to_input_audio)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    .run()</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<pre><code>(None, None)</code></pre>
+</div>
+</div>
+<p>Получим перевод файла в текст и аудио</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># S2ST</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>translated_text, wav, sr <span class="op">=</span> translator.predict(path_to_input_audio, <span class="st">"s2st"</span>, tgt_lang<span class="op">=</span><span class="st">"rus"</span>,)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Выведем текст на экран</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:339,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692724130313,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="b7b9b841-af12-42c1-9bcf-c573ea19fdd9">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(translated_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Здравствуйте, это шестиминутный английский с BBC Learning English. Я Нил и я Бет. У вас когда-нибудь был ужасный босс, которому не платили достаточно или который просто устал делать ту же старую работу?</code></pre>
+</div>
+</div>
+<p>И сохраним аудио в файл</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the translated audio generation.</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>torchaudio.save(</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"BBC.mp3"</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    wav[<span class="dv">0</span>].cpu(),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    sample_rate<span class="op">=</span>sr,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Text-to-text translation (T2TT)</p>
+<p>Получим перевод текста в текст</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># T2TT</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>translated_text, _, _ <span class="op">=</span> translator.predict(txt_orig, <span class="st">"t2tt"</span>, tgt_lang<span class="op">=</span><span class="st">"rus"</span>, src_lang<span class="op">=</span><span class="st">"eng"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>и выведем текстовый перевод на экран</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:293,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692721898380,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="fafe225b-9a55-4126-dda2-4e859291d0c0">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(translated_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Машинное обучение (ML) - это общий термин для решения проблем, для которых разработка алгоритмов человеческими программистами была бы недоступна, и вместо этого проблемы решаются, помогая машинам "открыть" свои "собственные" алгоритмы, без необходимости явного указания, что делать любыми разработанными человеком алгоритмами. В последнее время генеративные искусственные нейронные сети смогли превзойти результаты многих предыдущих подходов. Подходы машинного обучения были применены к большим языковым моделям, компьютерному зрению, распознаванию речи, фильтрации электронной почты, сельскому хозяйству и медицине, где разработка алгоритмов для выполнения необходимых задач слишком дорога.</code></pre>
+</div>
+</div>
+<p>Automatic speech recognition (ASR)</p>
+<p>Получим транскрибцию аудио файла</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ASR</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This is equivalent to S2TT with `&lt;tgt_lang&gt;=&lt;src_lang&gt;`.</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>transcribed_text, _, _ <span class="op">=</span> translator.predict(path_to_input_audio, <span class="st">"asr"</span>, <span class="st">"eng"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>и выведем ее на экран</p>
+<div class="cell" data-executioninfo="{&quot;elapsed&quot;:308,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1692724223213,&quot;user&quot;:{&quot;displayName&quot;:&quot;Vladimir Orlenko&quot;,&quot;userId&quot;:&quot;14647639487768811794&quot;},&quot;user_tz&quot;:-300}" data-outputid="c427cc36-05ef-433d-ca11-9ccc699de2ee">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(transcribed_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hello this is Six Minutes English from BBC Learning English I'm Neil and I'm Beth. Have you ever had a horrible boss not been paid enough or simply got tired of doing the same old-fashioned job?</code></pre>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
