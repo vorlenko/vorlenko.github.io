@@ -46,5 +46,11 @@
   },
   "posts/post-with-code/Kandinsky2 demo.ipynb": {
     "Kandinsky2 demo.html": "8bffeec2"
+  },
+  "posts/post-with-code/Kandinsky and ControlNet Demo.ipynb": {
+    "Kandinsky and ControlNet Demo.html": "27598e66"
+  },
+  "posts/welcome/CodeLlama.qmd": {
+    "CodeLlama.html": "b7b727ef"
   }
 }
